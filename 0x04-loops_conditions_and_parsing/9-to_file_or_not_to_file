@@ -13,18 +13,16 @@
 #if the file is a regular file: school is a regular file
 #if the file is not a regular file: (nothing)
 
-FILE="school"
-
-if [ -e "$FILE" ]
+if [ -e /tmp/school ]
 then
     echo "school file exists"
-    if [ ! -s "$FILE" ]
+    if [ -s /tmp/school ]
     then
-        echo "school file is empty"
-    else
         echo "school file is not empty"
+    else
+        echo "school file is empty"
     fi
-    if [ -f "$FILE" ]
+    if [ -f /tmp/school ]
     then
         echo "school is a regular file"
     fi
