@@ -1,12 +1,14 @@
 #!/usr/bin/env bash
-# displays Hi 10 times You must use the while loop (for and until are forbidden) You must use the if statement
+# displays Best School 10 times, but for the 9th iteration, displays Best School and then Hi on a new line.
+# use the while loop (for and until are forbidden) You must use the if statement
 COUNTER=0
-while [  $COUNTER -lt 10 ]; do
-if [ $((COUNTER % 2)) -eq 0 ]
-then
-echo "Hi"
-else
-echo "Holberton"
-fi
-(( COUNTER=COUNTER+1 ))
+while [ $COUNTER -lt 11 ]
+do
+    if [ $COUNTER = 9 ]
+    then
+        echo "Hi"
+    else
+        echo "Best School"
+    fi
+    (( COUNTER+=1 ))
 done
