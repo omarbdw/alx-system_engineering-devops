@@ -2,5 +2,4 @@
 # Write a Bash script that displays the PID, along with the process name, of processes whose name contain the word bash.
 # You cannot use ps
 
-# shellcheck disable=SC2009
-ps -a -x -u -f | grep "bash" | grep -v "grep" | awk '{print $2, $8}'
+pgrep -l bash
