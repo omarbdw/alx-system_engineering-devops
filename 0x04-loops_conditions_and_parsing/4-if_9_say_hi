@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
-# displays Hi 10 times using the until loop (for and while are forbidden)
+# displays Hi 10 times You must use the while loop (for and until are forbidden) You must use the if statement
 COUNTER=0
-until [  $COUNTER -ge 10 ]; do
+while [  $COUNTER -lt 10 ]; do
+if [ $((COUNTER % 2)) -eq 0 ]
+then
 echo "Hi"
+else
+echo "Holberton"
+fi
 (( COUNTER=COUNTER+1 ))
 done
