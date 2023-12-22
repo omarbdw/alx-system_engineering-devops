@@ -10,16 +10,16 @@
 # In a list format
 for (( c=1; c<=100; c++ ))
 do
-    if [ $(( $c % 3 )) -eq 0 ] && [ $(( $c % 5 )) -eq 0 ]
+    if [ $(( c % 3 )) -eq 0 ] && [ $(( c % 5 )) -eq 0 ]
     then
         echo "FizzBuzz"
-    elif [ $(( $c % 3 )) -eq 0 ]
+    elif [ $(( c % 3 )) -eq 0 ]
     then
         echo "Fizz"
-    elif [ $(( $c % 5 )) -eq 0 ]
+    elif [ $(( c % 5 )) -eq 0 ]
     then
         echo "Buzz"
     else
-        echo $c
+        echo "$c"
     fi
 done
