@@ -1,2 +1,3 @@
 #!/usr/bin/env ruby
-puts ARGV[0].scan(/School/).join
+# The regular expression
+puts ARGV[0].scan(/hbt{2,5}n/).join
