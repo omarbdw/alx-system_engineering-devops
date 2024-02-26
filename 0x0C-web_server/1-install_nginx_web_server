@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Install nginx
+apt-get update
+apt-get install -y nginx
+
+# Configure nginx to listen on port 80
+sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
+
+# Restart nginx
+service nginx restart
+
+# Create a temporary index.html file
+echo "Hello World!" > /var/www/html/index.html
+
+# Return the page containing "Hello World!" when querying Nginx at its root
+sed -i 's/root \/var\/www\/html;/root \/var\/www\/html;\n\tindex index.html;/g' /etc/nginx/sites-available/default
+
+# Restart nginx again
+kill -HUP $(cat /var/run/nginx.pid)
