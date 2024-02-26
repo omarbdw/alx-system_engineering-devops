@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Install nginx
+apt-get update
+apt-get install -y nginx
+
+# Configure nginx to listen on port 80
+sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
+
+# Create a page that contains the string "Hello World!"
+echo "Hello World!" > /var/www/html/index.html
+
+# Configure redirection
+echo "server {
+    listen 80;
+    server_name _;
+
+    location /redirect_me {
+        return 301 http://example.com/another-page;
+    }
+
+    location / {
+        root /var/www/html;
+    }
+}" > /etc/nginx/sites-available/default
+
+# Restart nginx
+service nginx restart
