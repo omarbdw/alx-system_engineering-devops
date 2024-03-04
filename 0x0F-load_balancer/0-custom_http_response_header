@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Install nginx
+# Update package lists
+apt-get -y update
+# Install nginx
+apt-get -y install nginx
+# Get the hostname
+HOST_NAME=$(hostname)
+# Define the custom header
+HEADER="\\\n\tadd_header X-Served-By $HOST_NAME;\n"
+# Check if the custom header already exists in the nginx configuration file
+FIND=$(grep "X-Server-by" /etc/nginx/sites-available/default)
+# If the custom header does not exist, add it to the configuration file
+if [[ -z $FIND ]]; then
+sed -i "23i $HEADER" /etc/nginx/sites-available/default
+fi
+# Create an index.html file with "Hello World!" content
+echo "Hello World!" > /var/www/html/index.html
+# Check if the redirect location already exists in the nginx configuration file
+FIND=$(grep "redirect_me" /etc/nginx/sites-available/default)
+# Define the redirect location
+STRING="\\\n\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
+# If the redirect location does not exist, add it to the configuration file
+if [[ -z $FIND ]]; then
+sed -i "42i $STRING" /etc/nginx/sites-available/default
+fi
+# Check if the custom error page already exists in the nginx configuration file
+FIND=$(grep "error_page 404" /etc/nginx/sites-available/default)
+# Define the custom error page
+ERROR="\\\n\terror_page 404 /custom_404.html;\n"
+# If the custom error page does not exist, create it and add it to the configuration file
+if [[ -z $FIND ]]; then
+echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
+sed -i "40i $ERROR" /etc/nginx/sites-available/default
+fi
+# Restart the nginx service
+service nginx restart

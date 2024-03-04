@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Install HAProxy
+# Update package lists
+apt-get -y update
+# Install specific version of HAProxy
+apt-get -y install haproxy=1.6.\*
+# Configure HAProxy
+echo '
+frontend omarbdw.tech
+bind 0:80
+default_backend web_servers
+backend web_servers
+balance roundrobin
+server omarbdw-web-01 100.25.45.246:80
+server omarbdw-web-02 18.204.11.210:80
+' >> /etc/haproxy/haproxy.cfg
+# Restart HAProxy service
+service haproxy restart
