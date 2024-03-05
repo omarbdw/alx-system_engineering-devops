@@ -12,10 +12,10 @@ sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/def
 echo "Hello World!" > /var/www/html/index.html
 
 # Configure Nginx to return the temporary index.html file at the root /
-sed -i 's/index index.html index.htm;/index index.html index.htm;\n\tlocation \/ {\n\t\treturn 200 \"Hello World!\";\n\t}/g' /etc/nginx/sites-available/default
+sed -i 's/index index.html index.htm;/index index.html index.htm;\n\tlocation \/ {\n\t\treturn 200 "Hello World!";\n\t}/g' /etc/nginx/sites-available/default
 
-# Configure Nginx to redirect /redirect_me to another page with a 301 Moved Permanently status
-sed -i 's/location \/ {/location \/redirect_me {\n\treturn 301 https:\/\/example.com;\n}\n\nlocation \/ {\n/g' /etc/nginx/sites-available/default
+# Configure Nginx to redirect /redirect_me to "https://www.youtube.com/watch?v=QH2-TGUlwu4" with a 301 Moved Permanently status
+sed -i 's/location \/ {/location \/redirect_me {\n\treturn 301 https:\/\/www.youtube.com\/watch?v=QH2-TGUlwu4;\n}\n\nlocation \/ {\n/g' /etc/nginx/sites-available/default
 
 # Restart Nginx without using systemctl
 service nginx restart
