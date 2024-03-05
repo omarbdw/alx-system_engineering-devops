@@ -5,6 +5,9 @@
 apt-get update
 apt-get install -y nginx
 
+# Enable Nginx to start on boot
+systemctl enable nginx
+
 # Configure Nginx to listen on port 80
 sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
 
