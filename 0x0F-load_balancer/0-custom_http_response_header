@@ -1,37 +1,74 @@
 #!/usr/bin/env bash
-# Install nginx
-# Update package lists
-apt-get -y update
-# Install nginx
-apt-get -y install nginx
-# Get the hostname
-HOST_NAME=$(hostname)
-# Define the custom header
-HEADER="\\\n\tadd_header X-Served-By $HOST_NAME;\n"
-# Check if the custom header already exists in the nginx configuration file
-FIND=$(grep "X-Server-by" /etc/nginx/sites-available/default)
-# If the custom header does not exist, add it to the configuration file
-if [[ -z $FIND ]]; then
-sed -i "23i $HEADER" /etc/nginx/sites-available/default
+# duplicate web-01 to web-02
+# these scripts are an upgrade from the web-server scripts...
+
+# uncomment to see the script run in action
+#set -x
+
+# colors
+blue='\e[1;34m'
+brown='\e[0;33m'
+green='\e[1;32m'
+reset='\033[0m'
+
+echo -e "${blue}Updating and doing some minor checks...${reset}\n"
+
+function install() {
+	command -v "$1" &> /dev/null
+	if [ $? -ne 0 ]; then
+		echo -e "	Installing: ${brown}$1${reset}\n"
+		sudo apt-get update -y -qq && \
+			sudo apt-get install -y "$1" -qq
+		echo -e "\n"
+	else
+		echo -e "	${green}${1} is already installed.${reset}\n"
+	fi
+}
+
+install nginx
+
+echo -e "\n${blue}Setting up some minor stuff.${reset}\n"
+sudo ufw allow 'Nginx HTTP'
+if [ -d "/var/www" ]; then
+	sudo chown -R "$USER":"$USER" /var/www
+	sudo chmod -R 755 /var/www
+else
+	sudo mkdir -p /var/www
+	sudo chown -R "$USER":"$USER" /var/www
+	sudo chmod -R 755 /var/www
 fi
-# Create an index.html file with "Hello World!" content
+for dir in /var/www/{html,error}; do
+	if ! [ -d "$dir" ]; then
+		mkdir -p "$dir"
+	fi
+done
 echo "Hello World!" > /var/www/html/index.html
-# Check if the redirect location already exists in the nginx configuration file
-FIND=$(grep "redirect_me" /etc/nginx/sites-available/default)
-# Define the redirect location
-STRING="\\\n\tlocation /redirect_me {\n\t\t return 301 https://www.youtube.com/watch?v=3MbaGJN2ioQ;\n\t}\n"
-# If the redirect location does not exist, add it to the configuration file
-if [[ -z $FIND ]]; then
-sed -i "42i $STRING" /etc/nginx/sites-available/default
+echo "Ceci n'est pas une page" > /var/www/html/error_404.html
+sudo cp /etc/nginx/sites-enabled/default nginx-sites-enabled_default.backup
+
+server_config=\
+"server {
+		listen 80 default_server;
+		listen [::]:80 default_server;
+		root /var/www/html;
+		index index.html index.htm index.nginx-debian.html
+		server_name_;
+		add_header X-Served-By \$hostname;
+		location / {
+			try_files \$uri \$uri/ =404;
+		}
+		if (\$request_filename ~ redirect_me){
+			rewrite ^ https://th3-gr00t.tk/ permanent;
+		}
+		error_page 404 /error_404.html;
+		location = /error_404.html {
+			internal;
+		}
+}"
+echo "$server_config" | sudo dd status=none of=/etc/nginx/sites-enabled/default
+
+if [ "$(pgrep -c nginx)" -le 0 ]; then
+	sudo service nginx start
+else
+	sudo service nginx restart
 fi
-# Check if the custom error page already exists in the nginx configuration file
-FIND=$(grep "error_page 404" /etc/nginx/sites-available/default)
-# Define the custom error page
-ERROR="\\\n\terror_page 404 /custom_404.html;\n"
-# If the custom error page does not exist, create it and add it to the configuration file
-if [[ -z $FIND ]]; then
-echo "Ceci n'est pas une page" > /var/www/html/custom_404.html
-sed -i "40i $ERROR" /etc/nginx/sites-available/default
-fi
-# Restart the nginx service
-service nginx restart

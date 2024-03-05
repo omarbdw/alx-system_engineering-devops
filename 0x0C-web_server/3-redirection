@@ -1,29 +1,24 @@
 #!/usr/bin/env bash
-# Install nginx and configure redirection
+# This script configures a brand new Ubuntu machine with Nginx
 
-# Install nginx
+# Install Nginx
 apt-get update
 apt-get install -y nginx
 
-# Configure nginx to listen on port 80
+# Configure Nginx to listen on port 80
 sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
 
-# Create a page that contains the string "Hello World!"
+# Restart Nginx without using systemctl
+service nginx restart
+
+# Create a temporary index.html file
 echo "Hello World!" > /var/www/html/index.html
 
-# Configure redirection
-echo "server {
-    listen 80;
-    server_name _;
+# Configure Nginx to return the temporary index.html file at the root /
+sed -i 's/index index.html index.htm;/index index.html index.htm;\n\tlocation \/ {\n\t\treturn 200 \"Hello World!\";\n\t}/g' /etc/nginx/sites-available/default
 
-    location /redirect_me {
-        return 301 http://example.com/another-page;
-    }
+# Configure Nginx to redirect /redirect_me to another page with a 301 Moved Permanently status
+sed -i 's/location \/ {/location \/redirect_me {\n\treturn 301 https:\/\/example.com;\n}\n\nlocation \/ {\n\treturn 301 \/redirect_me;\n}/g' /etc/nginx/sites-available/default
 
-    location / {
-        root /var/www/html;
-    }
-}" > /etc/nginx/sites-available/default
-
-# Restart nginx
+# Restart Nginx without using systemctl
 service nginx restart
