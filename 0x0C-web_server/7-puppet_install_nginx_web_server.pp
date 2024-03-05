@@ -1,23 +1,30 @@
-# Install nginx
+# Setup New Ubuntu server with nginx
+# and add a custom HTTP header
+
+exec { 'update system':
+        command => '/usr/bin/apt-get update',
+}
+
 package { 'nginx':
-	ensure => installed,
+	ensure => 'installed',
+	require => Exec['update system']
 }
 
-# Configure nginx to listen on port 80
-file { '/etc/nginx/sites-available/default':
-	ensure  => file,
-	content => "server {\n  listen 80;\n  server_name _;\n\n  location / {\n    return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n  }\n\n  location /redirect_me {\n    return 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n  }\n\n  error_page 404 /404.html;\n  location = /404.html {\n    root /usr/share/nginx/html;\n    internal;\n    return 404 'Ceci n\'est pas une page';\n  }\n}\n",
-	notify  => Exec['restart_nginx'],
+file {'/var/www/html/index.html':
+	content => 'Hello World!'
 }
 
-# Restart nginx
-exec { 'restart_nginx':
-	command     => '/etc/init.d/nginx restart',
-	refreshonly => true,
+exec {'redirect_me':
+	command => 'sed -i "24i\	rewrite ^/redirect_me https://th3-gr00t.tk/ permanent;" /etc/nginx/sites-available/default',
+	provider => 'shell'
 }
 
-# Create custom 404 page
-file { '/usr/share/nginx/html/404.html':
-	ensure  => file,
-	content => 'Ceci n\'est pas une page',
+exec {'HTTP header':
+	command => 'sed -i "25i\	add_header X-Served-By \$hostname;" /etc/nginx/sites-available/default',
+	provider => 'shell'
+}
+
+service {'nginx':
+	ensure => running,
+	require => Package['nginx']
 }
