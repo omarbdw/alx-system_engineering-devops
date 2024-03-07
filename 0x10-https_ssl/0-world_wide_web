@@ -1,19 +1,31 @@
 #!/usr/bin/env bash
-# This script takes in a URL, sends a request to that URL,
-# and displays the size of the body of the response
+# This script checks the IP address of a given domain and its subdomains
 
-if [ "$#" = 1 ]
-then
-    subdomains=("www" "lb-01" "web-01" "web-02")
-    for sub_domain in "${subdomains[@]}"
-    do
-	record_type=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
-        destination=$(dig $sub_domain.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
-	echo "The subdomain $sub_domain is a $record_type record and points to $destination"
-    done
-elif [ "$#" = 2 ]
-then
-    record_type=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $4}')
-    destination=$(dig $2.$1 | grep -A1 'ANSWER SECTION' | tail -1 | awk '{print $5}')
-    echo "The subdomain $2 is a $record_type record and points to $destination"
+# Check if the script is called with at least one argument
+if [ $# -lt 1 ]; then
+	echo "Usage: $0 domain [subdomain1 subdomain2 ...]"
+	exit 1
 fi
+
+domain="$1"
+
+# Define an array of default subdomains
+subdomains=("www" "lb-01" "web-01" "web-02")
+
+# If additional subdomains are provided, append them to the array
+if [ $# -gt 1 ]; then
+	subdomains+=("${@:2}")
+fi
+
+# Iterate over each subdomain in the array
+for subdomain in "${subdomains[@]}"; do
+	# Use dig command to get the IP address of the subdomain
+	output=$(dig "$subdomain.$domain" +short)
+	
+	# Check if the output is not empty
+	if [ -n "$output" ]; then
+		echo "The subdomain $subdomain has IP address $output"
+	else
+		echo "The subdomain $subdomain does not exist"
+	fi
+done
