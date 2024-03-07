@@ -1,28 +1,4 @@
 #!/usr/bin/env bash
 # This script fixes the issue of Nginx not listening on port 80
-
-# Install net-tools if not already installed
-if ! dpkg -s net-tools >/dev/null 2>&1; then
-	sudo apt-get update
-	sudo apt-get install -y net-tools
-fi
-
-# Check if Nginx is running
-if ! pgrep nginx >/dev/null 2>&1; then
-	sudo service nginx start
-fi
-
-# Check if Nginx is listening on port 80
-if ! netstat -tuln | grep ':80' >/dev/null 2>&1; then
-	# Get the server's active IPv4 IPs
-	ips=$(hostname -I | awk '{print $1}')
-
-	# Configure Nginx to listen on port 80 for all active IPs
-	sudo sed -i 's/listen 80;/listen 80 default_server;/g' /etc/nginx/sites-available/default
-	for ip in $ips; do
-		sudo sed -i "/listen \[::\]:80 default_server;/a \    listen $ip:80 default_server;" /etc/nginx/sites-available/default
-	done
-
-	# Restart Nginx
-	sudo service nginx restart
-fi
+sed -i 's/8080/80/g' /etc/nginx/sites-enabled/default
+service nginx restart
