@@ -18,11 +18,9 @@ if ! netstat -tuln | grep ':80' >/dev/null 2>&1; then
 	ips=$(hostname -I | awk '{print $1}')
 
 	# Configure Nginx to listen on port 80 for all active IPs
-	sudo sed -i 's/listen 80;/\
-	listen 80 default_server;/g' /etc/nginx/sites-available/default
+	sudo sed -i 's/listen 80;/listen 80 default_server;/g' /etc/nginx/sites-available/default
 	for ip in $ips; do
-		sudo sed -i "/listen \[::\]:80 default_server;/a \\
-			listen $ip:80 default_server;" /etc/nginx/sites-available/default
+		sudo sed -i "/listen \[::\]:80 default_server;/a \    listen $ip:80 default_server;" /etc/nginx/sites-available/default
 	done
 
 	# Restart Nginx
