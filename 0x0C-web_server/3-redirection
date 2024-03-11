@@ -1,28 +1,22 @@
 #!/usr/bin/env bash
 # This script configures a brand new Ubuntu machine with Nginx
 
-# Install Nginx
 apt-get update
 apt-get install -y nginx
 
-# start Nginx
 sudo service nginx start
 
-# allow Nginx through the firewall
-sudo ufw allow 'Nginx HTTP'
+# Configure nginx to listen on port 80
+sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
 
-# give user permission to /var/www/html and /var/www
-sudo chown -R $USER:"$USER" /var/www/html
-sudo chown -R 755 /var/www
+# Restart nginx
+service nginx restart
 
-# backup the default index
-sudo mv /var/www/html/index.nginx-debian.html /var/www/html/index.nginx-debian.html.bak
+# Create a temporary index.html file
+echo "Hello World!" > /var/www/html/index.html
 
-# Create a new index.html file
-ech -e "Hello world!" > /var/www/html/index.html
-
-# Create a temporary index
-exho -e "Hello World!" > /var/www/html/index.nginx-debian.html
+# Return the page containing "Hello World!" when querying Nginx at its root
+sed -i 's/root \/var\/www\/html;/root \/var\/www\/html;\n\tindex index.html;/g' /etc/nginx/sites-available/default
 
 # Configure Nginx to redirect /redirect_me to "https://www.youtube.com/watch?v=QH2-TGUlwu4" with a 301 Moved Permanently status
 sudo sed -i 's/location \/ {/location \/redirect_me {\n\treturn 301 https:\/\/www.youtube.com\/watch?v=QH2-TGUlwu4;\n}\n\nlocation \/ {\n/g' /etc/nginx/sites-available/default
