@@ -12,6 +12,13 @@ sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/def
 # Restart nginx
 service nginx restart
 
+# allowing nginx on firewall
+sudo ufw allow 'Nginx HTTP'
+
+# Give the user ownership to website files for easy editing
+sudo chown -R "$USER":"$USER" /var/www/html
+sudo chmod -R 755 /var/www
+
 # Create a temporary index.html file
 echo "Hello World!" > /var/www/html/index.html
 
