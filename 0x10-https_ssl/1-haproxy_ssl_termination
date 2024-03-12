@@ -45,7 +45,7 @@ frontend www-frontend
 	default_backend www-backend
 
 frontend www-https-frontend
-	bind *:443 ssl crt /etc/haproxy/certs/bennettdixon.online.pem
+	bind *:443 ssl crt /etc/letsencrypt/live/www.omarbdw.tech/fullchain.pem
 	reqadd X-Forwarded-Proto:\ https
 	default_backend www-backend
 
@@ -54,5 +54,5 @@ backend le-certbot-backend
 
 backend www-backend
         balance roundrobin
-        server omarbdw-web-01 100.25.45.246
-        server omarbdw-web-02 18.204.11.210
+        server 500479-web-01 100.25.45.246
+        server 500479-web-02 18.204.11.210
