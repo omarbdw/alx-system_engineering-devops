@@ -1,31 +1,31 @@
 #!/usr/bin/env bash
-# This script checks the IP address of a given domain and its subdomains
+# Script that takes in a URL, sends a request to that URL, and displays the size of the body of the response
 
-# Check if the script is called with at least one argument
-if [ $# -lt 1 ]; then
-	echo "Usage: $0 domain [subdomain1 subdomain2 ...]"
-	exit 1
-fi
+# Function to check the IP address of a domain
+check_ip_address() {
+	local domain=$1
+	local subdomain=$2
 
-domain="$1"
+	# Default subdomains to check
+	local subdomains=("www" "lb-01" "web-01" "web-02")
 
-# Define an array of default subdomains
-subdomains=("www" "lb-01" "web-01" "web-02")
-
-# If additional subdomains are provided, append them to the array
-if [ $# -gt 1 ]; then
-	subdomains+=("${@:2}")
-fi
-
-# Iterate over each subdomain in the array
-for subdomain in "${subdomains[@]}"; do
-	# Use dig command to get the IP address of the subdomain
-	output=$(dig "$subdomain.$domain" +short)
-	
-	# Check if the output is not empty
-	if [ -n "$output" ]; then
-		echo "The subdomain $subdomain is a A record and points to $output"
-	else
-		echo "The subdomain $subdomain does not exist"
+	# If subdomain is provided, use only that subdomain
+	if [[ -n $subdomain ]]; then
+		subdomains=("$subdomain")
 	fi
-done
+
+	# Loop through the subdomains and check their IP addresses
+	for sub in "${subdomains[@]}"; do
+		# Get the IP address using dig command
+		ip=$(dig +short $sub.$domain)
+
+		# Get the record type using awk command
+		record_type=$(dig $sub.$domain | awk '/^;; ANSWER SECTION:$/ { getline; print $4 }')
+
+		# Print the result
+		echo "The subdomain $sub is a $record_type record and points to $ip"
+	done
+}
+
+# Call the function with the provided arguments
+check_ip_address "$@"
