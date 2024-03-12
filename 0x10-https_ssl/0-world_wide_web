@@ -24,7 +24,7 @@ for subdomain in "${subdomains[@]}"; do
 	
 	# Check if the output is not empty
 	if [ -n "$output" ]; then
-		echo "The subdomain $subdomain has IP address $output"
+		echo "The subdomain $subdomain is a A record and points to $output"
 	else
 		echo "The subdomain $subdomain does not exist"
 	fi
