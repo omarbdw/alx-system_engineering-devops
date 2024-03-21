@@ -1,4 +1,12 @@
-#!/bin/env bash
+#!/usr/bin/env bash
+
+# This script creates a backup of all MySQL databases and compresses it into a single archive.
+
+# Check for root privileges
+if [ "$EUID" -ne 0 ]; then
+  echo "Error: Please run as root."
+  exit 1
+fi
 
 # Define variables
 MYSQL_USER="root"
