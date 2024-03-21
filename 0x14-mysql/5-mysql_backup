@@ -1,25 +1,32 @@
-#!/usr/bin/env bash
-#
-# This script is used to perform a backup of a MySQL database.
-# It creates a backup file with the current date and time as the filename,
-# and saves it in the specified directory.
+#!/bin/env bash
 
-# Get the current date
-date=$(date +'%d-%m-%Y')
+# Define variables
+MYSQL_USER="root"
+MYSQL_PASSWORD="$1"
+DATE=$(date +%d-%m-%Y)
+BACKUP_FILE="backup.sql"
+ARCHIVE_FILE="$DATE.tar.gz"
 
-# Set the MySQL root password
-password=$1
+# Dump all databases
+mysqldump -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" --all-databases > "$BACKUP_FILE"
 
-# Create a directory to store the backup
-mkdir -p backup
+# Check for dump success
+if [ $? -eq 0 ]; then
+  echo "Database dump created successfully!"
+else
+  echo "Error: Failed to create database dump."
+  exit 1
+fi
 
-# Generate the MySQL dump
-mysqldump -u root -p$password --all-databases > backup/backup.sql
+# Create compressed archive
+tar -czvf "$ARCHIVE_FILE" "$BACKUP_FILE"
 
-# Compress the MySQL dump to a tar.gz archive
-tar -czvf backup/$date.tar.gz backup/backup.sql
+# Check for archive creation success
+if [ $? -eq 0 ]; then
+  echo "Archive created successfully: $ARCHIVE_FILE"
+else
+  echo "Error: Failed to create archive."
+  exit 1
+fi
 
-# Remove the uncompressed dump file
-rm backup/backup.sql
-
-echo "MySQL backup created successfully!"
+echo "Backup completed."
