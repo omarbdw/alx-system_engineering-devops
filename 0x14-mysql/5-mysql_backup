@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 # This script creates a backup of all MySQL databases and compresses it into a single archive.
 
 # Check for root privileges
