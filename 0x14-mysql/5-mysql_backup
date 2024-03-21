@@ -1,39 +1,36 @@
 #!/usr/bin/env bash
 # This script creates a backup of all MySQL databases and compresses it into a single archive.
 
-# Check for root privileges
-if [ "$EUID" -ne 0 ]; then
-  echo "Error: Please run as root."
+# Check if password argument is provided
+if [ -z "$1" ]; then
+  echo "Error: Please provide the MySQL root password as an argument."
   exit 1
 fi
 
 # Define variables
 MYSQL_USER="root"
 MYSQL_PASSWORD="$1"
-DATE=$(date +%d-%m-%Y)
 BACKUP_FILE="backup.sql"
-ARCHIVE_FILE="$DATE.tar.gz"
+TODAY=$(date +%d-%m-%Y)
+ARCHIVE_FILE="$TODAY.tar.gz"
 
 # Dump all databases
 mysqldump -u "$MYSQL_USER" -p"$MYSQL_PASSWORD" --all-databases > "$BACKUP_FILE"
 
-# Check for dump success
-if [ $? -eq 0 ]; then
-  echo "Database dump created successfully!"
-else
-  echo "Error: Failed to create database dump."
+# Check for dump errors
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to create MySQL dump."
   exit 1
 fi
 
 # Create compressed archive
 tar -czvf "$ARCHIVE_FILE" "$BACKUP_FILE"
 
-# Check for archive creation success
-if [ $? -eq 0 ]; then
-  echo "Archive created successfully: $ARCHIVE_FILE"
-else
-  echo "Error: Failed to create archive."
+# Check for archive creation errors
+if [ $? -ne 0 ]; then
+  echo "Error: Failed to create compressed archive."
   exit 1
 fi
 
-echo "Backup completed."
+echo "MySQL dump and compressed archive created successfully!"
+echo "Archive file: $ARCHIVE_FILE"
