@@ -10,7 +10,7 @@ if __name__ == "__main__":
     employee = requests.get(
         "https://jsonplaceholder.typicode.com/users/{}".format(userId),
         timeout=5)
-    employeeName = employee.json().get('name')
+    employeeName = employee.json().get('username')
 
     todos = requests.get(
         'https://jsonplaceholder.typicode.com/todos', timeout=5)
