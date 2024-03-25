@@ -6,7 +6,7 @@ import requests
 
 if __name__ == "__main__":
 
-    userId = sys.argv[1]
+    userId = int(sys.argv[1])
     employee = requests.get(
         "https://jsonplaceholder.typicode.com/users/{}".format(userId),
         timeout=5)
