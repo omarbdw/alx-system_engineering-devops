@@ -8,8 +8,8 @@ if __name__ == "__main__":
 
     userId = sys.argv[1]
     employee = requests.get(
-        "https://jsonplaceholder.typicode.com/users/{}".format(userId), timeout=5)
-
+        "https://jsonplaceholder.typicode.com/users/{}".format(userId),
+        timeout=5)
     employeeName = employee.json().get('name')
 
     todos = requests.get(
