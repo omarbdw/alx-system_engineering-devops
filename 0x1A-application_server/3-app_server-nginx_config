@@ -1,0 +1,41 @@
+server
+{
+# Listen on port 80 for HTTP requests
+listen 80 default_server;
+
+# Listen on port 80 for IPv6 requests
+listen [::]:80 default_server;
+
+# Set the server name to the specified IP address
+server_name 100.25.45.246;
+
+# Add a custom header with the server hostname
+add_header X-Served-By $hostname;
+
+# Handle requests for the /airbnb-onepage/ URL
+location = /airbnb-onepage/
+{
+# Proxy the request to the specified backend server
+proxy_pass http://127.0.0.1:5000/airbnb-onepage/;
+}
+
+# Handle requests for the /number_odd_or_even/ URL
+location ~ /airbnb-dynamic/number_odd_or_even/(\d+)$
+{
+# Proxy the request to the specified backend server
+proxy_pass http://100.25.45.246:5001/number_odd_or_even/$1;
+}
+
+# Set the custom error page for 404 errors
+error_page 404 /404.html;
+
+# Handle requests for the /404 URL
+location /404
+{
+# Set the root directory for serving the error page
+root /var/www/html;
+
+# Restrict access to this location from external requests
+internal;
+}
+}
